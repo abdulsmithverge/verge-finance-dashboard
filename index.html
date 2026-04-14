@@ -81,7 +81,8 @@
     <h3>Goal tracker by sector</h3>
     <div class="legend">
       <span><i style="background:#1AE5D0;"></i> Booked</span>
-      <span><i style="background:#18169E; opacity:0.5;"></i> Remaining to goal</span>
+      <span><i style="background:#18169E; opacity:0.5;"></i> Remaining</span>
+      <span><span class="line-icon" style="border-top-color:#E918C2;"></span>&nbsp;Goal</span>
     </div>
     <div style="position:relative;height:220px;">
       <canvas id="goalChart" role="img" aria-label="Stacked column chart showing booked revenue vs remaining goal by sector">Goal tracker by sector.</canvas>
@@ -240,16 +241,108 @@
           labels: ["Gov't", 'Private', 'Nonprofit'],
           datasets: [
             { label: 'Booked', data: [govtRev, privateRev, nonprofitRev], backgroundColor: C.teal, borderRadius: 4 },
-            { label: 'Remaining', data: [govtRemaining, privateRemaining, nonprofitRemaining], backgroundColor: C.navyFade, borderRadius: 4 }
+            { label: 'Remaining', data: [govtRemaining, privateRemaining, nonprofitRemaining], backgroundColor: C.navyFade, borderRadius: 4 },
+            {
+              label: 'Goal',
+              data: [govtGoal, privateGoal, nonprofitGoal],
+              type: 'line',
+              borderColor: C.pink,
+              borderWidth: 2,
+              borderDash: [4, 3],
+              pointBackgroundColor: C.pink,
+              pointRadius: 5,
+              pointStyle: 'circle',
+              fill: false,
+              order: 0
+            }
           ]
         },
         options: {
           responsive: true, maintainAspectRatio: false,
           scales: {
             x: { stacked: true, ticks: tickCfg, grid: { display: false } },
-            y: { stacked: true, ticks: { ...tickCfg, callback: v => '$' + (v / 1000).toFixed(0) + 'k' }, grid: gridCfg }
+            y: { stacked: true, ticks: { ...tickCfg, callback: v => '
+
+      // --- Avg monthly combo chart ---
+      new Chart(document.getElementById('avgChart'), {
+        type: 'bar',
+        data: {
+          labels: ['Monthly average'],
+          datasets: [
+            {
+              label: 'Avg monthly expenses',
+              data: [avgMonthlyExp],
+              backgroundColor: C.pink,
+              borderRadius: 4,
+              barThickness: 80
+            },
+            {
+              label: 'Avg monthly revenue',
+              data: [avgMonthlyRev],
+              type: 'line',
+              borderColor: C.teal,
+              borderWidth: 2,
+              borderDash: [6, 4],
+              pointBackgroundColor: C.teal,
+              pointRadius: 4,
+              fill: false
+            }
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          scales: {
+            x: { ticks: tickCfg, grid: { display: false } },
+            y: {
+              ticks: { ...tickCfg, callback: v => '$' + (v / 1000).toFixed(0) + 'k' },
+              grid: gridCfg,
+              suggestedMax: Math.max(avgMonthlyRev, avgMonthlyExp) * 1.25
+            }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: ctx => ' ' + fmt(ctx.parsed.y) } }
+          }
+        }
+      });
+
+      // --- Avg monthly expenses breakdown ---
+      new Chart(document.getElementById('expChart'), {
+        type: 'bar',
+        data: {
+          labels: ['Contractors', 'Tooling & Ops', 'Team Payroll'],
+          datasets: [{
+            data: [contractors, toolingOps, teamPayroll],
+            backgroundColor: [C.pink, C.navy, C.teal],
+            borderRadius: 4
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          scales: {
+            x: { ticks: tickCfg, grid: { display: false } },
+            y: { ticks: { ...tickCfg, callback: v => '$' + (v / 1000).toFixed(0) + 'k' }, grid: gridCfg }
           },
           plugins: { legend: { display: false } }
+        }
+      });
+
+    } catch (err) {
+      console.error(err);
+      document.body.innerHTML += '<p class="error">Could not load data. Make sure the sheet is set to "Anyone with the link can view."</p>';
+    }
+  }
+
+  loadData();
+</script>
+</body>
+</html>
+ + (v / 1000).toFixed(0) + 'k' }, grid: gridCfg }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + fmt(ctx.parsed.y) } }
+          }
         }
       });
 

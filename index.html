@@ -132,7 +132,8 @@
 
   function parseVal(str) {
     if (!str) return 0;
-    return parseFloat(str.replace(/[$,\s]/g, '')) || 0;
+    const cleaned = str.replace(/[$,\s\r\n"]/g, '').trim();
+    return parseFloat(cleaned) || 0;
   }
 
   async function loadData() {
@@ -167,6 +168,13 @@
       const privateRemaining    = Math.max(0, privateGoal - privateRev);
       const nonprofitRemaining  = Math.max(0, nonprofitGoal - nonprofitRev);
 
+      console.log('DEBUG rows:', {
+        govtRev, privateRev, nonprofitRev, totalRev,
+        avgMonthlyRev, avgMonthlyExp,
+        contractors, toolingOps, teamPayroll,
+        plRevenue, plExpenses, gapToClose,
+        govtGoal, privateGoal, nonprofitGoal
+      });
       const netPL = plRevenue - plExpenses;
 
       // --- Metric cards ---

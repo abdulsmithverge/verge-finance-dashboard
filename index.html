@@ -141,7 +141,18 @@
       const res = await fetch(CSV_URL);
       if (!res.ok) throw new Error('Failed to fetch sheet');
       const text = await res.text();
-      const rows = text.trim().split('\n').map(r => r.split(','));
+      const rows = text.trim().split('\n').map(r => {
+        const result = [];
+        let cur = '', inQuotes = false;
+        for (let i = 0; i < r.length; i++) {
+          const ch = r[i];
+          if (ch === '"') { inQuotes = !inQuotes; }
+          else if (ch === ',' && !inQuotes) { result.push(cur); cur = ''; }
+          else { cur += ch; }
+        }
+        result.push(cur);
+        return result;
+      });
 
       // Row indices are 0-based (row 11 in Sheets = index 10)
       const govtRev        = parseVal(rows[10]?.[1]);

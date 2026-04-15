@@ -82,8 +82,7 @@
     <h3>Goal tracker by sector</h3>
     <div class="legend">
       <span><i style="background:#1AE5D0;"></i> Booked</span>
-      <span><i style="background:#18169E; opacity:0.5;"></i> Remaining</span>
-      <span><span class="line-icon" style="border-top-color:#E918C2;"></span>&nbsp;Goal</span>
+      <span><i style="background:#18169E; opacity:0.5;"></i> Remaining to goal</span>
     </div>
     <div style="position:relative;height:220px;">
       <canvas id="goalChart" role="img" aria-label="Stacked column chart showing booked revenue vs remaining goal by sector">Goal tracker by sector.</canvas>
@@ -243,20 +242,7 @@
           labels: ["Gov't", 'Private', 'Nonprofit'],
           datasets: [
             { label: 'Booked', data: [govtRev, privateRev, nonprofitRev], backgroundColor: C.teal, borderRadius: 4 },
-            { label: 'Remaining', data: [govtRemaining, privateRemaining, nonprofitRemaining], backgroundColor: C.navyFade, borderRadius: 4 },
-            {
-              label: 'Goal',
-              data: [govtGoal, privateGoal, nonprofitGoal],
-              type: 'line',
-              borderColor: C.pink,
-              borderWidth: 2,
-              borderDash: [4, 3],
-              pointBackgroundColor: C.pink,
-              pointRadius: 5,
-              pointStyle: 'circle',
-              fill: false,
-              order: 0
-            }
+            { label: 'Remaining', data: [govtRemaining, privateRemaining, nonprofitRemaining], backgroundColor: C.navyFade, borderRadius: 4 }
           ]
         },
         options: {
@@ -267,7 +253,16 @@
           },
           plugins: {
             legend: { display: false },
-            tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + fmt(ctx.parsed.y) } }
+            tooltip: {
+              callbacks: {
+                afterBody: ctx => {
+                  const i = ctx[0].dataIndex;
+                  const goals = [govtGoal, privateGoal, nonprofitGoal];
+                  return 'Goal: ' + fmt(goals[i]);
+                },
+                label: ctx => ' ' + ctx.dataset.label + ': ' + fmt(ctx.parsed.y)
+              }
+            }
           }
         }
       });

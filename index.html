@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -115,6 +116,7 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+
 <script>
   const SHEET_ID = '1lkGCEmasb0DwK7nyKHQykh5_SMYYdIeYYcJymHebFFI';
   const GID = '0';
@@ -261,83 +263,7 @@
           responsive: true, maintainAspectRatio: false,
           scales: {
             x: { stacked: true, ticks: tickCfg, grid: { display: false } },
-            y: { stacked: true, ticks: { ...tickCfg, callback: v => '
-
-      // --- Avg monthly combo chart ---
-      new Chart(document.getElementById('avgChart'), {
-        type: 'bar',
-        data: {
-          labels: ['Monthly average'],
-          datasets: [
-            {
-              label: 'Avg monthly expenses',
-              data: [avgMonthlyExp],
-              backgroundColor: C.pink,
-              borderRadius: 4,
-              barThickness: 80
-            },
-            {
-              label: 'Avg monthly revenue',
-              data: [avgMonthlyRev],
-              type: 'line',
-              borderColor: C.teal,
-              borderWidth: 2,
-              borderDash: [6, 4],
-              pointBackgroundColor: C.teal,
-              pointRadius: 4,
-              fill: false
-            }
-          ]
-        },
-        options: {
-          responsive: true, maintainAspectRatio: false,
-          scales: {
-            x: { ticks: tickCfg, grid: { display: false } },
-            y: {
-              ticks: { ...tickCfg, callback: v => '$' + (v / 1000).toFixed(0) + 'k' },
-              grid: gridCfg,
-              suggestedMax: Math.max(avgMonthlyRev, avgMonthlyExp) * 1.25
-            }
-          },
-          plugins: {
-            legend: { display: false },
-            tooltip: { callbacks: { label: ctx => ' ' + fmt(ctx.parsed.y) } }
-          }
-        }
-      });
-
-      // --- Avg monthly expenses breakdown ---
-      new Chart(document.getElementById('expChart'), {
-        type: 'bar',
-        data: {
-          labels: ['Contractors', 'Tooling & Ops', 'Team Payroll'],
-          datasets: [{
-            data: [contractors, toolingOps, teamPayroll],
-            backgroundColor: [C.pink, C.navy, C.teal],
-            borderRadius: 4
-          }]
-        },
-        options: {
-          responsive: true, maintainAspectRatio: false,
-          scales: {
-            x: { ticks: tickCfg, grid: { display: false } },
-            y: { ticks: { ...tickCfg, callback: v => '$' + (v / 1000).toFixed(0) + 'k' }, grid: gridCfg }
-          },
-          plugins: { legend: { display: false } }
-        }
-      });
-
-    } catch (err) {
-      console.error(err);
-      document.body.innerHTML += '<p class="error">Could not load data. Make sure the sheet is set to "Anyone with the link can view."</p>';
-    }
-  }
-
-  loadData();
-</script>
-</body>
-</html>
- + (v / 1000).toFixed(0) + 'k' }, grid: gridCfg }
+            y: { stacked: true, ticks: { ...tickCfg, callback: v => '$' + (v / 1000).toFixed(0) + 'k' }, grid: gridCfg }
           },
           plugins: {
             legend: { display: false },
@@ -418,5 +344,6 @@
 
   loadData();
 </script>
+
 </body>
 </html>

@@ -285,11 +285,15 @@
               data: [avgMonthlyRev],
               type: 'line',
               borderColor: C.teal,
-              borderWidth: 2,
+              borderWidth: 3,
               borderDash: [6, 4],
               pointBackgroundColor: C.teal,
-              pointRadius: 4,
-              fill: false
+              pointBorderColor: C.teal,
+              pointRadius: 8,
+              pointHoverRadius: 10,
+              fill: false,
+              order: 0,
+              datalabels: { display: false }
             }
           ]
         },
@@ -300,7 +304,8 @@
             y: {
               ticks: { ...tickCfg, callback: v => '$' + (v / 1000).toFixed(0) + 'k' },
               grid: gridCfg,
-              suggestedMax: Math.max(avgMonthlyRev, avgMonthlyExp) * 1.25
+              suggestedMin: Math.min(avgMonthlyRev, avgMonthlyExp) * 0.85,
+              suggestedMax: Math.max(avgMonthlyRev, avgMonthlyExp) * 1.2
             }
           },
           plugins: {

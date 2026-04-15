@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -115,7 +114,6 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-
 <script>
   const SHEET_ID = '1lkGCEmasb0DwK7nyKHQykh5_SMYYdIeYYcJymHebFFI';
   const GID = '0';
@@ -242,42 +240,137 @@
           labels: ["Gov't", 'Private', 'Nonprofit'],
           datasets: [
             { label: 'Booked', data: [govtRev, privateRev, nonprofitRev], backgroundColor: C.teal, borderRadius: 4 },
-            { label: 'Remaining', data: [govtRemaining, privateRemaining, nonprofitRemaining], backgroundColor: C.navyFade, borderRadius: 4 }
+            { label: 'Remaining', data: [govtRemaining, privateRemaining, nonprofitRemaining], backgroundColor: C.navyFade, borderRadius: 4 },
+            {
+              label: 'Goal',
+              data: [govtGoal, privateGoal, nonprofitGoal],
+              type: 'line',
+              borderColor: C.pink,
+              borderWidth: 2,
+              borderDash: [4, 3],
+              pointBackgroundColor: C.pink,
+              pointRadius: 5,
+              pointStyle: 'circle',
+              fill: false,
+              order: 0
+            }
           ]
         },
         options: {
           responsive: true, maintainAspectRatio: false,
           scales: {
             x: { stacked: true, ticks: tickCfg, grid: { display: false } },
-            y: { stacked: true, ticks: { ...tickCfg, callback: v => '$' + (v / 1000).toFixed(0) + 'k' }, grid: gridCfg }
+            y: { stacked: true, ticks: { ...tickCfg, callback: v => '
+
+      // --- Avg monthly combo chart ---
+      new Chart(document.getElementById('avgChart'), {
+        type: 'bar',
+        data: {
+          labels: ['Monthly average'],
+          datasets: [
+            {
+              label: 'Avg monthly expenses',
+              data: [avgMonthlyExp],
+              backgroundColor: C.pink,
+              borderRadius: 4,
+              barThickness: 80
+            },
+            {
+              label: 'Avg monthly revenue',
+              data: [avgMonthlyRev],
+              type: 'line',
+              borderColor: C.teal,
+              borderWidth: 3,
+              borderDash: [6, 4],
+              pointBackgroundColor: C.teal,
+              pointBorderColor: C.teal,
+              pointRadius: 8,
+              pointHoverRadius: 10,
+              fill: false,
+              order: 0,
+              datalabels: { display: false }
+            }
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          scales: {
+            x: { ticks: tickCfg, grid: { display: false } },
+            y: {
+              ticks: { ...tickCfg, callback: v => '
           },
           plugins: {
             legend: { display: false },
-            tooltip: {
-              callbacks: {
-                afterBody: ctx => {
-                  const i = ctx[0].dataIndex;
-                  const goals = [govtGoal, privateGoal, nonprofitGoal];
-                  return 'Goal: ' + fmt(goals[i]);
-                },
-                label: ctx => ' ' + ctx.dataset.label + ': ' + fmt(ctx.parsed.y)
-              }
-            }
+            tooltip: { callbacks: { label: ctx => ' ' + fmt(ctx.parsed.y) } }
           }
         }
       });
 
-      // --- Avg monthly side by side bar chart ---
+      // --- Avg monthly expenses breakdown ---
+      new Chart(document.getElementById('expChart'), {
+        type: 'bar',
+        data: {
+          labels: ['Contractors', 'Tooling & Ops', 'Team Payroll'],
+          datasets: [{
+            data: [contractors, toolingOps, teamPayroll],
+            backgroundColor: [C.pink, C.navy, C.teal],
+            borderRadius: 4
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          scales: {
+            x: { ticks: tickCfg, grid: { display: false } },
+            y: { ticks: { ...tickCfg, callback: v => '$' + (v / 1000).toFixed(0) + 'k' }, grid: gridCfg }
+          },
+          plugins: { legend: { display: false } }
+        }
+      });
+
+    } catch (err) {
+      console.error(err);
+      document.body.innerHTML += '<p class="error">Could not load data. Make sure the sheet is set to "Anyone with the link can view."</p>';
+    }
+  }
+
+  loadData();
+</script>
+</body>
+</html>
+ + (v / 1000).toFixed(0) + 'k' }, grid: gridCfg }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + fmt(ctx.parsed.y) } }
+          }
+        }
+      });
+
+      // --- Avg monthly combo chart ---
       new Chart(document.getElementById('avgChart'), {
         type: 'bar',
         data: {
-          labels: ['Avg Monthly Revenue', 'Avg Monthly Expenses'],
-          datasets: [{
-            data: [avgMonthlyRev, avgMonthlyExp],
-            backgroundColor: [C.teal, C.pink],
-            borderRadius: 4,
-            barThickness: 60
-          }]
+          labels: ['Monthly average'],
+          datasets: [
+            {
+              label: 'Avg monthly expenses',
+              data: [avgMonthlyExp],
+              backgroundColor: C.pink,
+              borderRadius: 4,
+              barThickness: 80
+            },
+            {
+              label: 'Avg monthly revenue',
+              data: [avgMonthlyRev],
+              type: 'line',
+              borderColor: C.teal,
+              borderWidth: 2,
+              borderDash: [6, 4],
+              pointBackgroundColor: C.teal,
+              pointRadius: 4,
+              fill: false
+            }
+          ]
         },
         options: {
           responsive: true, maintainAspectRatio: false,
@@ -286,8 +379,7 @@
             y: {
               ticks: { ...tickCfg, callback: v => '$' + (v / 1000).toFixed(0) + 'k' },
               grid: gridCfg,
-              suggestedMin: Math.min(avgMonthlyRev, avgMonthlyExp) * 0.85,
-              suggestedMax: Math.max(avgMonthlyRev, avgMonthlyExp) * 1.15
+              suggestedMax: Math.max(avgMonthlyRev, avgMonthlyExp) * 1.25
             }
           },
           plugins: {
@@ -326,6 +418,132 @@
 
   loadData();
 </script>
+</body>
+</html>
+ + (v / 1000).toFixed(0) + 'k' },
+              grid: gridCfg,
+              suggestedMin: Math.min(avgMonthlyRev, avgMonthlyExp) * 0.85,
+              suggestedMax: Math.max(avgMonthlyRev, avgMonthlyExp) * 1.2
+            }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: ctx => ' ' + fmt(ctx.parsed.y) } }
+          }
+        }
+      });
 
+      // --- Avg monthly expenses breakdown ---
+      new Chart(document.getElementById('expChart'), {
+        type: 'bar',
+        data: {
+          labels: ['Contractors', 'Tooling & Ops', 'Team Payroll'],
+          datasets: [{
+            data: [contractors, toolingOps, teamPayroll],
+            backgroundColor: [C.pink, C.navy, C.teal],
+            borderRadius: 4
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          scales: {
+            x: { ticks: tickCfg, grid: { display: false } },
+            y: { ticks: { ...tickCfg, callback: v => '$' + (v / 1000).toFixed(0) + 'k' }, grid: gridCfg }
+          },
+          plugins: { legend: { display: false } }
+        }
+      });
+
+    } catch (err) {
+      console.error(err);
+      document.body.innerHTML += '<p class="error">Could not load data. Make sure the sheet is set to "Anyone with the link can view."</p>';
+    }
+  }
+
+  loadData();
+</script>
+</body>
+</html>
+ + (v / 1000).toFixed(0) + 'k' }, grid: gridCfg }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + fmt(ctx.parsed.y) } }
+          }
+        }
+      });
+
+      // --- Avg monthly combo chart ---
+      new Chart(document.getElementById('avgChart'), {
+        type: 'bar',
+        data: {
+          labels: ['Monthly average'],
+          datasets: [
+            {
+              label: 'Avg monthly expenses',
+              data: [avgMonthlyExp],
+              backgroundColor: C.pink,
+              borderRadius: 4,
+              barThickness: 80
+            },
+            {
+              label: 'Avg monthly revenue',
+              data: [avgMonthlyRev],
+              type: 'line',
+              borderColor: C.teal,
+              borderWidth: 2,
+              borderDash: [6, 4],
+              pointBackgroundColor: C.teal,
+              pointRadius: 4,
+              fill: false
+            }
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          scales: {
+            x: { ticks: tickCfg, grid: { display: false } },
+            y: {
+              ticks: { ...tickCfg, callback: v => '$' + (v / 1000).toFixed(0) + 'k' },
+              grid: gridCfg,
+              suggestedMax: Math.max(avgMonthlyRev, avgMonthlyExp) * 1.25
+            }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: ctx => ' ' + fmt(ctx.parsed.y) } }
+          }
+        }
+      });
+
+      // --- Avg monthly expenses breakdown ---
+      new Chart(document.getElementById('expChart'), {
+        type: 'bar',
+        data: {
+          labels: ['Contractors', 'Tooling & Ops', 'Team Payroll'],
+          datasets: [{
+            data: [contractors, toolingOps, teamPayroll],
+            backgroundColor: [C.pink, C.navy, C.teal],
+            borderRadius: 4
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          scales: {
+            x: { ticks: tickCfg, grid: { display: false } },
+            y: { ticks: { ...tickCfg, callback: v => '$' + (v / 1000).toFixed(0) + 'k' }, grid: gridCfg }
+          },
+          plugins: { legend: { display: false } }
+        }
+      });
+
+    } catch (err) {
+      console.error(err);
+      document.body.innerHTML += '<p class="error">Could not load data. Make sure the sheet is set to "Anyone with the link can view."</p>';
+    }
+  }
+
+  loadData();
+</script>
 </body>
 </html>

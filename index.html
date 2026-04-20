@@ -83,7 +83,7 @@
     <h3>Goal tracker by sector</h3>
     <div class="legend">
       <span><i style="background:#1AE5D0;"></i> Booked</span>
-      <span><i style="background:#18169E; opacity:0.5;"></i> Remaining to goal</span>
+      <span><i style="background:#E918C260;"></i> Remaining to goal</span>
     </div>
     <div style="position:relative;height:220px;">
       <canvas id="goalChart" role="img" aria-label="Stacked column chart showing booked revenue vs remaining goal by sector">Goal tracker by sector.</canvas>
@@ -267,7 +267,7 @@
           labels: ['Gov', 'Non-Gov'],
           datasets: [
             { label: 'Booked', data: [govBooked, nonGovBooked], backgroundColor: C.teal, borderRadius: 4 },
-            { label: 'Remaining', data: [govRemaining, nonGovRemaining], backgroundColor: C.navyFade, borderRadius: 4 }
+            { label: 'Remaining', data: [govRemaining, nonGovRemaining], backgroundColor: '#E918C260', borderRadius: 4 }
           ]
         },
         options: {

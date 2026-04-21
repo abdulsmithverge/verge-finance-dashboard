@@ -19,15 +19,16 @@
     .metric .val.pos { color: #1AE5D0; }
     .metric .val.neg { color: #E918C2; }
     .metric .sub { font-size: 11px; color: #8888aa; margin-top: 4px; }
-    .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
     .card { background: #131326; border: 0.5px solid #1AE5D020; border-radius: 12px; padding: 16px; }
     .card h3 { font-size: 12px; font-weight: 500; color: #8888aa; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 14px; }
     .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 10px; font-size: 11px; color: #8888aa; }
     .legend span { display: flex; align-items: center; gap: 5px; }
     .legend i { width: 8px; height: 8px; border-radius: 2px; display: inline-block; flex-shrink: 0; }
+    .bottom-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .left-col { display: flex; flex-direction: column; gap: 16px; }
     @media (max-width: 768px) {
       .top-row { grid-template-columns: 1fr; }
-      .charts-row { grid-template-columns: 1fr; }
+      .bottom-row { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -67,8 +68,8 @@
   </div>
 </div>
 
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
-  <div style="display:flex;flex-direction:column;gap:16px;">
+<div class="bottom-row">
+  <div class="left-col">
     <div class="card">
       <h3>Revenue by vertical</h3>
       <div class="legend">
@@ -92,13 +93,13 @@
       </div>
     </div>
   </div>
-  <div class="card">
+  <div class="card" style="display:flex;flex-direction:column;">
     <h3>Goal tracker by sector</h3>
     <div class="legend">
       <span><i style="background:#1AE5D0;"></i> Booked</span>
       <span><i style="background:#E918C2;"></i> Remaining to goal</span>
     </div>
-    <div style="position:relative;height:100%;">
+    <div style="position:relative;flex:1;min-height:460px;">
       <canvas id="goalChart" role="img" aria-label="Stacked column chart showing booked revenue vs remaining goal by sector">Goal tracker by sector.</canvas>
     </div>
   </div>
@@ -112,7 +113,7 @@
 
   const C = {
     pink: '#E918C2', navy: '#18169E', teal: '#1AE5D0',
-    navyFade: '#18169E60', grid: '#ffffff10', text: '#8888aa'
+    grid: '#ffffff10', text: '#8888aa'
   };
   const tickCfg = { color: C.text, font: { size: 10, family: 'Roboto' } };
   const gridCfg = { color: C.grid };
@@ -123,14 +124,13 @@
 
   function parseVal(str) {
     if (!str) return 0;
-    const cleaned = str.replace(/[$,\s\r\n"]/g, '').trim();
-    return parseFloat(cleaned) || 0;
+    return parseFloat(str.replace(/[$,\s\r\n"]/g, '').trim()) || 0;
   }
 
   async function loadData() {
     try {
       const res = await fetch(CSV_URL);
-      if (!res.ok) throw new Error('Failed to fetch sheet');
+      if (!res.ok) throw new Error('Failed to fetch');
       const text = await res.text();
       const rows = text.trim().split('\n').map(r => {
         const result = [];
@@ -145,38 +145,38 @@
         return result;
       });
 
-      const govtRev        = parseVal(rows[10]?.[1]);
-      const privateRev     = parseVal(rows[11]?.[1]);
-      const nonprofitRev   = parseVal(rows[12]?.[1]);
-      const totalRev       = parseVal(rows[13]?.[1]);
-      const avgMonthlyRev  = parseVal(rows[17]?.[1]);
-      const avgMonthlyExp  = parseVal(rows[18]?.[1]);
-      const contractors    = parseVal(rows[23]?.[1]);
-      const toolingOps     = parseVal(rows[24]?.[1]);
-      const teamPayroll    = parseVal(rows[25]?.[1]);
-      const plRevenue      = parseVal(rows[29]?.[1]);
-      const plExpenses     = parseVal(rows[30]?.[1]);
-      const gapToClose     = parseVal(rows[31]?.[1]);
-      const govBooked      = parseVal(rows[37]?.[1]);
-      const nonGovBooked   = parseVal(rows[38]?.[1]);
-      const govGoal        = parseVal(rows[37]?.[3]);
-      const nonGovGoal     = parseVal(rows[38]?.[3]);
+      const govtRev       = parseVal(rows[10]?.[1]);
+      const privateRev    = parseVal(rows[11]?.[1]);
+      const nonprofitRev  = parseVal(rows[12]?.[1]);
+      const totalRev      = parseVal(rows[13]?.[1]);
+      const avgMonthlyRev = parseVal(rows[17]?.[1]);
+      const avgMonthlyExp = parseVal(rows[18]?.[1]);
+      const contractors   = parseVal(rows[23]?.[1]);
+      const toolingOps    = parseVal(rows[24]?.[1]);
+      const teamPayroll   = parseVal(rows[25]?.[1]);
+      const plRevenue     = parseVal(rows[29]?.[1]);
+      const plExpenses    = parseVal(rows[30]?.[1]);
+      const gapToClose    = parseVal(rows[31]?.[1]);
+      const govBooked     = parseVal(rows[37]?.[1]);
+      const nonGovBooked  = parseVal(rows[38]?.[1]);
+      const govGoal       = parseVal(rows[37]?.[3]);
+      const nonGovGoal    = parseVal(rows[38]?.[3]);
 
-      const govRemaining      = Math.max(0, govGoal - govBooked);
-      const nonGovRemaining   = Math.max(0, nonGovGoal - nonGovBooked);
+      const govRemaining    = Math.max(0, govGoal - govBooked);
+      const nonGovRemaining = Math.max(0, nonGovGoal - nonGovBooked);
 
-      const bkEl = document.getElementById('m-bk');
-      const bkSub = document.getElementById('m-bk-sub');
+      const bkEl    = document.getElementById('m-bk');
+      const bkSub   = document.getElementById('m-bk-sub');
       const bkLabel = document.getElementById('m-bk-label');
       if (gapToClose < 0) {
-        bkEl.textContent = '-' + fmt(gapToClose);
-        bkEl.className = 'val neg';
-        bkSub.textContent = 'Deficit to close';
+        bkEl.textContent    = '-' + fmt(gapToClose);
+        bkEl.className      = 'val neg';
+        bkSub.textContent   = 'Deficit to close';
         bkLabel.textContent = 'Breakeven Gap';
       } else {
-        bkEl.textContent = fmt(gapToClose);
-        bkEl.className = 'val pos';
-        bkSub.textContent = 'Surplus above breakeven';
+        bkEl.textContent    = fmt(gapToClose);
+        bkEl.className      = 'val pos';
+        bkSub.textContent   = 'Surplus above breakeven';
         bkLabel.textContent = 'Net Profit';
       }
 
@@ -186,28 +186,15 @@
         type: 'bar',
         data: {
           labels: ['Total Revenue', 'Total Expenses'],
-          datasets: [{
-            data: [plRevenue, plExpenses],
-            backgroundColor: [C.teal, C.pink],
-            borderRadius: 4,
-            barThickness: 50
-          }]
+          datasets: [{ data: [plRevenue, plExpenses], backgroundColor: [C.teal, C.pink], borderRadius: 4, barThickness: 50 }]
         },
         options: {
           responsive: true, maintainAspectRatio: false,
           scales: {
             x: { ticks: tickCfg, grid: { display: false } },
-            y: {
-              ticks: { ...tickCfg, callback: v => '$' + (v / 1000).toFixed(0) + 'k' },
-              grid: gridCfg,
-              suggestedMin: Math.min(plRevenue, plExpenses) * 0.85,
-              suggestedMax: Math.max(plRevenue, plExpenses) * 1.15
-            }
+            y: { ticks: { ...tickCfg, callback: v => '$' + (v / 1000).toFixed(0) + 'k' }, grid: gridCfg, suggestedMin: Math.min(plRevenue, plExpenses) * 0.85, suggestedMax: Math.max(plRevenue, plExpenses) * 1.15 }
           },
-          plugins: {
-            legend: { display: false },
-            tooltip: { callbacks: { label: ctx => ' ' + fmt(ctx.parsed.y) } }
-          }
+          plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + fmt(ctx.parsed.y) } } }
         }
       });
 
@@ -215,28 +202,15 @@
         type: 'bar',
         data: {
           labels: ['Avg Monthly Revenue', 'Avg Monthly Expenses'],
-          datasets: [{
-            data: [avgMonthlyRev, avgMonthlyExp],
-            backgroundColor: [C.teal, C.pink],
-            borderRadius: 4,
-            barThickness: 50
-          }]
+          datasets: [{ data: [avgMonthlyRev, avgMonthlyExp], backgroundColor: [C.teal, C.pink], borderRadius: 4, barThickness: 50 }]
         },
         options: {
           responsive: true, maintainAspectRatio: false,
           scales: {
             x: { ticks: tickCfg, grid: { display: false } },
-            y: {
-              ticks: { ...tickCfg, callback: v => '$' + (v / 1000).toFixed(0) + 'k' },
-              grid: gridCfg,
-              suggestedMin: Math.min(avgMonthlyRev, avgMonthlyExp) * 0.85,
-              suggestedMax: Math.max(avgMonthlyRev, avgMonthlyExp) * 1.15
-            }
+            y: { ticks: { ...tickCfg, callback: v => '$' + (v / 1000).toFixed(0) + 'k' }, grid: gridCfg, suggestedMin: Math.min(avgMonthlyRev, avgMonthlyExp) * 0.85, suggestedMax: Math.max(avgMonthlyRev, avgMonthlyExp) * 1.15 }
           },
-          plugins: {
-            legend: { display: false },
-            tooltip: { callbacks: { label: ctx => ' ' + fmt(ctx.parsed.y) } }
-          }
+          plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + fmt(ctx.parsed.y) } } }
         }
       });
 
@@ -244,19 +218,11 @@
         type: 'pie',
         data: {
           labels: ["Gov't", 'Private sector', 'Nonprofit'],
-          datasets: [{
-            data: [govtRev, privateRev, nonprofitRev],
-            backgroundColor: [C.pink, C.navy, C.teal],
-            borderColor: '#131326',
-            borderWidth: 2
-          }]
+          datasets: [{ data: [govtRev, privateRev, nonprofitRev], backgroundColor: [C.pink, C.navy, C.teal], borderColor: '#131326', borderWidth: 2 }]
         },
         options: {
           responsive: true, maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            tooltip: { callbacks: { label: ctx => ' ' + fmt(ctx.parsed) + ' (' + Math.round(ctx.parsed / totalRev * 100) + '%)' } }
-          }
+          plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + fmt(ctx.parsed) + ' (' + Math.round(ctx.parsed / totalRev * 100) + '%)' } } }
         }
       });
 
@@ -266,23 +232,22 @@
           labels: ['Gov', 'Non-Gov'],
           datasets: [
             { label: 'Booked', data: [govBooked, nonGovBooked], backgroundColor: C.teal, borderRadius: 4 },
-            { label: 'Remaining', data: [govRemaining, nonGovRemaining], backgroundColor: '#E918C2', borderRadius: 4 }
+            { label: 'Remaining', data: [govRemaining, nonGovRemaining], backgroundColor: C.pink, borderRadius: 4 }
           ]
         },
         options: {
           responsive: true, maintainAspectRatio: false,
           scales: {
             x: { stacked: true, ticks: tickCfg, grid: { display: false } },
-            y: { stacked: true, ticks: { ...tickCfg, stepSize: 100000, callback: v => '
+            y: { stacked: true, ticks: { ...tickCfg, stepSize: 100000, callback: v => '$' + (v / 1000).toFixed(0) + 'k' }, grid: gridCfg, max: Math.ceil(Math.max(govGoal, nonGovGoal) / 100000) * 100000 }
           },
           plugins: {
             legend: { display: false },
             tooltip: {
               callbacks: {
                 afterBody: ctx => {
-                  const i = ctx[0].dataIndex;
                   const goals = [govGoal, nonGovGoal];
-                  return 'Goal: ' + fmt(goals[i]);
+                  return 'Goal: ' + fmt(goals[ctx[0].dataIndex]);
                 },
                 label: ctx => ' ' + ctx.dataset.label + ': ' + fmt(ctx.parsed.y)
               }
@@ -295,59 +260,7 @@
         type: 'bar',
         data: {
           labels: ['Contractors', 'Tooling & Ops', 'Team Payroll'],
-          datasets: [{
-            data: [contractors, toolingOps, teamPayroll],
-            backgroundColor: [C.pink, C.navy, C.teal],
-            borderRadius: 4
-          }]
-        },
-        options: {
-          responsive: true, maintainAspectRatio: false,
-          scales: {
-            x: { ticks: tickCfg, grid: { display: false } },
-            y: { ticks: { ...tickCfg, callback: v => '$' + (v / 1000).toFixed(0) + 'k' }, grid: gridCfg }
-          },
-          plugins: { legend: { display: false } }
-        }
-      });
-
-    } catch (err) {
-      console.error(err);
-      document.body.innerHTML += '<p style="color:#E918C2;font-size:13px;text-align:center;padding:40px 0;">Could not load data. Make sure the sheet is set to "Anyone with the link can view."</p>';
-    }
-  }
-
-  loadData();
-</script>
-</body>
-</html>
- + (v / 1000).toFixed(0) + 'k' }, grid: gridCfg, max: Math.ceil(Math.max(govGoal, nonGovGoal) / 100000) * 100000 }
-          },
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              callbacks: {
-                afterBody: ctx => {
-                  const i = ctx[0].dataIndex;
-                  const goals = [govGoal, nonGovGoal];
-                  return 'Goal: ' + fmt(goals[i]);
-                },
-                label: ctx => ' ' + ctx.dataset.label + ': ' + fmt(ctx.parsed.y)
-              }
-            }
-          }
-        }
-      });
-
-      new Chart(document.getElementById('expChart'), {
-        type: 'bar',
-        data: {
-          labels: ['Contractors', 'Tooling & Ops', 'Team Payroll'],
-          datasets: [{
-            data: [contractors, toolingOps, teamPayroll],
-            backgroundColor: [C.pink, C.navy, C.teal],
-            borderRadius: 4
-          }]
+          datasets: [{ data: [contractors, toolingOps, teamPayroll], backgroundColor: [C.pink, C.navy, C.teal], borderRadius: 4 }]
         },
         options: {
           responsive: true, maintainAspectRatio: false,

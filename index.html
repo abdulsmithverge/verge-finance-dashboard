@@ -160,8 +160,8 @@
       const gapToClose     = parseVal(rows[31]?.[1]);
       const govBooked      = parseVal(rows[37]?.[1]);
       const nonGovBooked   = parseVal(rows[38]?.[1]);
-      const govGoal        = parseVal(rows[37]?.[2]);
-      const nonGovGoal     = parseVal(rows[38]?.[2]);
+      const govGoal        = parseVal(rows[37]?.[3]);
+      const nonGovGoal     = parseVal(rows[38]?.[3]);
 
       const govRemaining      = Math.max(0, govGoal - govBooked);
       const nonGovRemaining   = Math.max(0, nonGovGoal - nonGovBooked);

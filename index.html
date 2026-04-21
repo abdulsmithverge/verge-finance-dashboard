@@ -67,40 +67,39 @@
   </div>
 </div>
 
-<div class="charts-row">
-  <div class="card">
-    <h3>Revenue by vertical</h3>
-    <div class="legend">
-      <span><i style="background:#E918C2;"></i> Gov't</span>
-      <span><i style="background:#18169E;"></i> Private sector</span>
-      <span><i style="background:#1AE5D0;"></i> Nonprofit</span>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+  <div style="display:flex;flex-direction:column;gap:16px;">
+    <div class="card">
+      <h3>Revenue by vertical</h3>
+      <div class="legend">
+        <span><i style="background:#E918C2;"></i> Gov't</span>
+        <span><i style="background:#18169E;"></i> Private sector</span>
+        <span><i style="background:#1AE5D0;"></i> Nonprofit</span>
+      </div>
+      <div style="position:relative;height:220px;">
+        <canvas id="pieChart" role="img" aria-label="Pie chart showing revenue split by vertical">Revenue by vertical breakdown.</canvas>
+      </div>
     </div>
-    <div style="position:relative;height:220px;">
-      <canvas id="pieChart" role="img" aria-label="Pie chart showing revenue split by vertical">Revenue by vertical breakdown.</canvas>
+    <div class="card">
+      <h3>Avg monthly expenses breakdown</h3>
+      <div class="legend">
+        <span><i style="background:#E918C2;"></i> Contractors</span>
+        <span><i style="background:#18169E;"></i> Tooling &amp; Ops</span>
+        <span><i style="background:#1AE5D0;"></i> Team Payroll</span>
+      </div>
+      <div style="position:relative;height:220px;">
+        <canvas id="expChart" role="img" aria-label="Bar chart showing average monthly expenses by category">Avg monthly expenses breakdown.</canvas>
+      </div>
     </div>
   </div>
   <div class="card">
     <h3>Goal tracker by sector</h3>
     <div class="legend">
       <span><i style="background:#1AE5D0;"></i> Booked</span>
-      <span><i style="background:#E918C260;"></i> Remaining to goal</span>
+      <span><i style="background:#E918C2;"></i> Remaining to goal</span>
     </div>
-    <div style="position:relative;height:220px;">
+    <div style="position:relative;height:100%;">
       <canvas id="goalChart" role="img" aria-label="Stacked column chart showing booked revenue vs remaining goal by sector">Goal tracker by sector.</canvas>
-    </div>
-  </div>
-</div>
-
-<div class="charts-row">
-  <div class="card">
-    <h3>Avg monthly expenses breakdown</h3>
-    <div class="legend">
-      <span><i style="background:#E918C2;"></i> Contractors</span>
-      <span><i style="background:#18169E;"></i> Tooling &amp; Ops</span>
-      <span><i style="background:#1AE5D0;"></i> Team Payroll</span>
-    </div>
-    <div style="position:relative;height:220px;">
-      <canvas id="expChart" role="img" aria-label="Bar chart showing average monthly expenses by category">Avg monthly expenses breakdown.</canvas>
     </div>
   </div>
 </div>
@@ -267,14 +266,62 @@
           labels: ['Gov', 'Non-Gov'],
           datasets: [
             { label: 'Booked', data: [govBooked, nonGovBooked], backgroundColor: C.teal, borderRadius: 4 },
-            { label: 'Remaining', data: [govRemaining, nonGovRemaining], backgroundColor: '#E918C260', borderRadius: 4 }
+            { label: 'Remaining', data: [govRemaining, nonGovRemaining], backgroundColor: '#E918C2', borderRadius: 4 }
           ]
         },
         options: {
           responsive: true, maintainAspectRatio: false,
           scales: {
             x: { stacked: true, ticks: tickCfg, grid: { display: false } },
-            y: { stacked: true, ticks: { ...tickCfg, callback: v => '$' + (v / 1000).toFixed(0) + 'k' }, grid: gridCfg }
+            y: { stacked: true, ticks: { ...tickCfg, stepSize: 100000, callback: v => '
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                afterBody: ctx => {
+                  const i = ctx[0].dataIndex;
+                  const goals = [govGoal, nonGovGoal];
+                  return 'Goal: ' + fmt(goals[i]);
+                },
+                label: ctx => ' ' + ctx.dataset.label + ': ' + fmt(ctx.parsed.y)
+              }
+            }
+          }
+        }
+      });
+
+      new Chart(document.getElementById('expChart'), {
+        type: 'bar',
+        data: {
+          labels: ['Contractors', 'Tooling & Ops', 'Team Payroll'],
+          datasets: [{
+            data: [contractors, toolingOps, teamPayroll],
+            backgroundColor: [C.pink, C.navy, C.teal],
+            borderRadius: 4
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          scales: {
+            x: { ticks: tickCfg, grid: { display: false } },
+            y: { ticks: { ...tickCfg, callback: v => '$' + (v / 1000).toFixed(0) + 'k' }, grid: gridCfg }
+          },
+          plugins: { legend: { display: false } }
+        }
+      });
+
+    } catch (err) {
+      console.error(err);
+      document.body.innerHTML += '<p style="color:#E918C2;font-size:13px;text-align:center;padding:40px 0;">Could not load data. Make sure the sheet is set to "Anyone with the link can view."</p>';
+    }
+  }
+
+  loadData();
+</script>
+</body>
+</html>
+ + (v / 1000).toFixed(0) + 'k' }, grid: gridCfg, max: Math.ceil(Math.max(govGoal, nonGovGoal) / 100000) * 100000 }
           },
           plugins: {
             legend: { display: false },

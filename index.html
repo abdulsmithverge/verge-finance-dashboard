@@ -7,20 +7,20 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #0d0d1a; padding: 24px; min-height: 100vh; font-family: 'Roboto', sans-serif; }
-    .header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #1AE5D040; }
-    .header h1 { font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 500; color: #fff; letter-spacing: 0.3px; }
-    .header span { font-family: 'Roboto', sans-serif; font-size: 13px; color: #1AE5D0; margin-left: auto; white-space: nowrap; }
+    body { background: #f5f5f7; padding: 24px; min-height: 100vh; font-family: 'Roboto', sans-serif; }
+    .header { display: flex; align-items: center; gap: 12px; background: #fff; border-radius: 12px; padding: 14px 16px; margin-bottom: 16px; border: 0.5px solid #e0e0e8; }
+    .header h1 { font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 600; color: #18169E; letter-spacing: 0.2px; }
+    .header span { font-family: 'Roboto', sans-serif; font-size: 12px; color: #8888aa; margin-left: auto; white-space: nowrap; }
     .top-row { display: grid; grid-template-columns: 1fr 180px 1fr; gap: 16px; margin-bottom: 16px; align-items: stretch; }
-    .metric { background: #131326; border: 0.5px solid #1AE5D030; border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; justify-content: center; }
-    .metric label { font-family: 'Poppins', sans-serif; font-size: 11px; color: #8888aa; text-transform: uppercase; letter-spacing: 0.8px; display: block; margin-bottom: 6px; }
+    .metric { background: #18169E; border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; justify-content: center; }
+    .metric label { font-family: 'Poppins', sans-serif; font-size: 11px; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 0.8px; display: block; margin-bottom: 6px; }
     .metric .val { font-family: 'Poppins', sans-serif; font-size: 26px; font-weight: 600; color: #fff; }
     .metric .val.pos { color: #1AE5D0; }
     .metric .val.neg { color: #E918C2; }
-    .metric .sub { font-family: 'Roboto', sans-serif; font-size: 11px; color: #8888aa; margin-top: 4px; }
-    .card { background: #131326; border: 0.5px solid #1AE5D020; border-radius: 12px; padding: 16px; }
-    .card h3 { font-family: 'Poppins', sans-serif; font-size: 11px; font-weight: 500; color: #8888aa; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 14px; }
-    .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 10px; font-family: 'Roboto', sans-serif; font-size: 11px; color: #8888aa; }
+    .metric .sub { font-family: 'Roboto', sans-serif; font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 4px; }
+    .card { background: #fff; border: 0.5px solid #e0e0e8; border-radius: 12px; padding: 16px; }
+    .card h3 { font-family: 'Poppins', sans-serif; font-size: 11px; font-weight: 600; color: #18169E; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 14px; }
+    .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 10px; font-family: 'Roboto', sans-serif; font-size: 11px; color: #666; }
     .legend span { display: flex; align-items: center; gap: 5px; }
     .legend i { width: 8px; height: 8px; border-radius: 2px; display: inline-block; flex-shrink: 0; }
     .bottom-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
@@ -36,7 +36,11 @@
 <div class="header">
   <!-- LOGO: Replace the SVG below with an <img> tag pointing to your logo file -->
   <!-- Example: <img src="verge-logo.png" height="32" alt="Verge Talent Partners" /> -->
-  <img src="Verge-mark.png" height="32" alt="Verge Talent Partners" />
+  <svg width="32" height="32" viewBox="0 0 32 32">
+    <polygon points="16,2 26,12 16,22 6,12" fill="#E918C2" opacity="0.95"/>
+    <polygon points="20,6 30,16 20,26 10,16" fill="#18169E" opacity="0.9"/>
+    <polygon points="12,10 22,20 12,30 2,20" fill="#1AE5D0" opacity="0.85"/>
+  </svg>
   <h1>Verge Talent Partners — Finance Dashboard</h1>
   <span id="updated">Loading...</span>
 </div>
@@ -112,7 +116,7 @@
   const GID = '0';
   const CSV_URL = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/export?format=csv&gid=' + GID;
 
-  const C = { pink: '#E918C2', navy: '#18169E', teal: '#1AE5D0', grid: '#ffffff10', text: '#8888aa' };
+  const C = { pink: '#E918C2', navy: '#18169E', teal: '#1AE5D0', grid: '#e0e0e8', text: '#888888' };
   const tickCfg = { color: C.text, font: { size: 10, family: 'Roboto' } };
   const gridCfg = { color: C.grid };
 
@@ -214,7 +218,7 @@
         type: 'pie',
         data: {
           labels: ["Gov't", 'Private sector', 'Nonprofit'],
-          datasets: [{ data: [govtRev, privateRev, nonprofitRev], backgroundColor: [C.pink, C.navy, C.teal], borderColor: '#131326', borderWidth: 2 }]
+          datasets: [{ data: [govtRev, privateRev, nonprofitRev], backgroundColor: [C.pink, C.navy, C.teal], borderColor: '#fff', borderWidth: 2 }]
         },
         options: {
           responsive: true, maintainAspectRatio: false,
